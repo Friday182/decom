@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title></title>
+<style>
+    *
+        { 
+        margin:0; 
+        padding:0; 
+        list-style:none;
+        }
+    #box
+        { 
+        width:300px; 
+        height:300px; 
+        border:1px solid #000; 
+        border-radius:50%; 
+        position:absolute; 
+        left:300px; 
+        top:100px; 
+        background:#fff; 
+        box-shadow:1px 1px 5px #000;
+        }
+    #box .cap
+        { 
+        width:20px; 
+        border-radius:50%; 
+        height:20px; 
+        background:#999; 
+        position:absolute; 
+        left:50%; 
+        top:50%; 
+        margin:-10px 0 0 -10px;
+        }
+
+    #box div
+        { 
+        transform-origin:center bottom;
+        }
+    #box .hour
+        { 
+        width:14px; 
+        height:80px; 
+        background:#000; 
+        position:absolute; 
+        left:50%; 
+        margin-left:-7px; 
+        top:50%; 
+        margin-top:-80px; 
+        border-radius:50% 50% 0 0;
+        }
+    #box .min
+        { 
+        width:10px; 
+        height:100px; 
+        background:#282828; 
+        position:absolute; 
+        left:50%; 
+        margin-left:-5px; 
+        top:50%;
+        margin-top:-100px;
+        border-radius:50% 50% 0 0;
+        }
+    #box .sec
+        { 
+        width:4px; 
+        height:120px; 
+        background:#f00; 
+        position:absolute; 
+        left:50%; 
+        margin-left:-2px; 
+        top:50%; 
+        margin-top:-120px;
+        }
+
+    .scale
+        { 
+        width:4px; 
+        height:10px; 
+        background:#000; 
+        position:absolute; 
+        left:50%; 
+        margin-left:-2px; 
+        transform-origin:center 150px;
+        }
+    .bs
+        { 
+        width:6px; 
+        height:18px; 
+        background:#000; 
+        position:absolute; 
+        left:50%; 
+        margin-left:-3px;
+        transform-origin:center 150px;
+        }
+    #box span em
+        { 
+        margin-top:20px; 
+        width:100px; 
+        position:absolute; 
+        left:50%; 
+        margin-left:-50px; 
+        text-align:center;
+        font-style:normal;
+        }
+</style>
+<script>
+window.onload=function(){
+    var oBox=document.getElementById('box');
+    var oH=document.querySelector('.hour');
+    var oM=document.querySelector('.min');
+    var oS=document.querySelector('.sec');
+    
+    //生成刻度
+    var N=60;
+    for(var i=0; i<N; i++){
+        var oSpan=document.createElement('span');
+        if(i%5==0){
+            oSpan.className='bs';
+            var num=i/5==0?12:i/5;
+            oSpan.innerHTML='<em>'+num+'<\/em>';
+            oSpan.children[0].style.transform='rotate('+-i*6+'deg)';
+        }else{
+            oSpan.className='scale';    
+        }
+        oBox.appendChild(oSpan);
+        
+        oSpan.style.transform='rotate('+6*i+'deg)';
+    }
+    function clock(){
+        var oDate=new Date();
+        var h=oDate.getHours();
+        var m=oDate.getMinutes();
+        var s=oDate.getSeconds();
+        var ms=oDate.getMilliseconds();
+        oH.style.transform='rotate('+(h*30+m/60*30)+'deg)';
+        oM.style.transform='rotate('+(m*6+s/60*6)+'deg)';
+        oS.style.transform='rotate('+(s*6+ms/1000*6)+'deg)';    
+    }
+    clock();
+    setInterval(clock,30);
+
+    drag(oBox);
+    //拖拽
+    function drag(oDiv){
+        oDiv.onmousedown=function(ev){
+            var oEvent=ev || event;
+            var disX=oEvent.clientX-oDiv.offsetLeft;
+            var disY=oEvent.clientY-oDiv.offsetTop;
+            document.onmousemove=function(ev){
+                var oEvent=ev || event;
+                oDiv.style.left=oEvent.clientX-disX+'px';
+                oDiv.style.top=oEvent.clientY-disY+'px';    
+            };
+            document.onmouseup=function(){
+                document.onmousemove=null;
+                document.onmouseup=null;    
+                oDiv.releaseCapture && oDiv.releaseCapture();
+            };
+            oDiv.setCapture && oDiv.setCapture();
+            return false;   
+        };
+    };
+};
+</script>
+</head>
+
+<body>
+<div id="box">
+    <div class="hour"></div>
+    <div class="min"></div>
+    <div class="sec"></div>
+    <div class="cap"></div>
+</div>
+</body>
+</html>
+
